@@ -19,9 +19,8 @@ ASSISTANT_ID = "asst_afzqzKDfiL5izhDUfkJu54Lo"
 api_key = st.text_input("OpenAI API 키를 입력하세요:", type="password")
 
 if api_key:
-    # OpenAI 클라이언트 초기화
-    client = OpenAI()
-    client.api_key = api_key
+    # OpenAI 클라이언트 초기화 - API 키 직접 전달
+    client = OpenAI(api_key=api_key)
     
     try:
         # Thread 생성 (처음 한 번만 실행)
