@@ -1,4 +1,5 @@
 import streamlit as st
+import os
 from openai import OpenAI
 import time
 
@@ -19,10 +20,11 @@ ASSISTANT_ID = "asst_afzqzKDfiL5izhDUfkJu54Lo"
 api_key = st.text_input("OpenAI API 키를 입력하세요:", type="password")
 
 if api_key:
-    # OpenAI 클라이언트 초기화 - API 키 직접 전달
-    client = OpenAI(api_key=api_key)
-    
     try:
+        # OpenAI 클라이언트 초기화
+        os.environ["OPENAI_API_KEY"] = api_key
+        client = OpenAI()
+        
         # Thread 생성 (처음 한 번만 실행)
         if not st.session_state.thread_id:
             thread = client.beta.threads.create()
@@ -31,21 +33,21 @@ if api_key:
         # 사용자 입력
         user_input = st.text_input("메시지를 입력하세요:")
         if st.button("전송") and user_input:
-            # 메시지 추가
-            message = client.beta.threads.messages.create(
-                thread_id=st.session_state.thread_id,
-                role="user",
-                content=user_input
-            )
-            
-            # 실행
-            run = client.beta.threads.runs.create(
-                thread_id=st.session_state.thread_id,
-                assistant_id=ASSISTANT_ID
-            )
-            
-            # 응답 대기
             with st.spinner("답변을 생성 중입니다..."):
+                # 메시지 추가
+                message = client.beta.threads.messages.create(
+                    thread_id=st.session_state.thread_id,
+                    role="user",
+                    content=user_input
+                )
+                
+                # 실행
+                run = client.beta.threads.runs.create(
+                    thread_id=st.session_state.thread_id,
+                    assistant_id=ASSISTANT_ID
+                )
+                
+                # 응답 대기
                 while True:
                     run = client.beta.threads.runs.retrieve(
                         thread_id=st.session_state.thread_id,
